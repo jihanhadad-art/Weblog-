@@ -5,17 +5,17 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Web-Log // Spider-Routine</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
-–bg:      #ede9e3;
-–bg2:     #ffffff;
-–bg3:     #e2ddd6;
-–card:    #ffffff;
+–bg:      #d8d0c5;
+–bg2:     #ffffff; –card: #ffffff;
+–bg3:     #ccc5bb;
+–card:    #fff;
 –red:     #c41a1a;
 –red2:    #e02020;
 –redl:    #fbeaea;
@@ -43,35 +43,35 @@ background-size: 20px 20px;
 .corner-web { position: fixed; top: 0; right: 0; z-index: 0; width: 220px; height: 220px; pointer-events: none; opacity: .055; }
 
 /* MINI SPIDERMEN */
-.mini-spidey { position: fixed; z-index: 2; pointer-events: none; opacity: .1; }
+.mini-spidey { position: fixed; z-index: 1; pointer-events: none; opacity: .1; }
 .ms-1 { bottom: 90px;  right: 6px;  width: 36px; transform: rotate(12deg); }
-.ms-2 { top: 150px;    left: 4px;   width: 26px; transform: rotate(-18deg) scaleX(-1); }
+.ms-2 { top: 280px;    left: 4px;   width: 26px; transform: rotate(-18deg) scaleX(-1); }
 .ms-3 { bottom: 220px; left: 8px;   width: 20px; transform: rotate(6deg); }
-.ms-4 { top: 300px;    right: 3px;  width: 16px; transform: rotate(-8deg); }
+.ms-4 { top: 420px;    right: 3px;  width: 16px; transform: rotate(-8deg); }
 .ms-thread { position: fixed; z-index: 1; pointer-events: none; width: 1px; background: rgba(0,0,0,.07); transform-origin: top; }
 .mt-1 { right: 20px; top: 0; height: 100px; transform: rotate(3deg); }
 .mt-2 { left: 16px;  top: 0; height: 170px; transform: rotate(-5deg); }
 
 /* HEADER */
-header { position: relative; z-index: 10; background: var(–bg2); border-bottom: 3px solid var(–red); box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+header { position: relative; z-index: 20; background: var(–bg2); border-bottom: 3px solid var(–red); box-shadow: 0 2px 10px rgba(0,0,0,.06); }
 .header-top { display: flex; align-items: stretch; }
-.header-logo-block { background: var(–red); padding: 1rem 2.2rem 1rem 1.2rem; display: flex; align-items: center; justify-content: center; clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%); }
+.header-logo-block { background: var(–red); padding: 1rem 2.2rem 1rem 1.2rem; display: flex; align-items: center; justify-content: center; }
 .header-center { flex: 1; padding: .9rem 1.2rem; }
-.header-eyebrow { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 400; letter-spacing: .25em; text-transform: uppercase; color: var(–muted); margin-bottom: .15rem; }
-.header-title { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 1.55rem; font-weight: 700; line-height: 1; color: var(–text); letter-spacing: .04em; text-transform: uppercase; }
+.header-eyebrow { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 400; letter-spacing: .25em; text-transform: uppercase; color: var(–muted); margin-bottom: .15rem; }
+.header-title { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 1.55rem; font-weight: 700; line-height: 1; color: var(–text); letter-spacing: .04em; text-transform: uppercase; }
 .header-title .red { color: var(–red); }
 .header-date-block { padding: .9rem 1.1rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; border-left: 1px solid var(–border); }
-.header-date { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .68rem; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; color: var(–muted); line-height: 1.7; text-align: right; }
+.header-date { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .68rem; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; color: var(–muted); line-height: 1.7; text-align: right; }
 .header-date strong { color: var(–text); font-size: .9rem; display: block; }
 .header-progress { display: flex; align-items: center; gap: .75rem; padding: .55rem 1.2rem; border-top: 1px solid var(–border); background: var(–bg3); }
 .prog-outer { flex: 1; height: 4px; background: var(–border2); position: relative; overflow: hidden; border-radius: 2px; }
 .prog-inner { height: 100%; background: var(–red); transition: width .5s cubic-bezier(.4,0,.2,1); border-radius: 2px; position: relative; }
 .prog-inner::after { content: ‘◆’; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); color: var(–red); font-size: .5rem; }
-.prog-label { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .72rem; font-weight: 600; color: var(–muted); letter-spacing: .08em; white-space: nowrap; }
+.prog-label { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .72rem; font-weight: 600; color: var(–muted); letter-spacing: .08em; white-space: nowrap; }
 .prog-label strong { color: var(–red); }
 
 /* TICKER */
-.quote-ticker { position: relative; z-index: 10; background: var(–red); padding: .45rem 1.2rem; font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .75rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.92); overflow: hidden; white-space: nowrap; display: flex; align-items: center; gap: 1rem; }
+.quote-ticker { position: relative; z-index: 10; background: var(–red); padding: .45rem 1.2rem; font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .75rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.92); overflow: hidden; white-space: nowrap; display: flex; align-items: center; gap: 1rem; }
 .ticker-label { background: rgba(0,0,0,.2); padding: .1rem .5rem; border-radius: 2px; font-size: .62rem; letter-spacing: .15em; flex-shrink: 0; }
 .ticker-inner { animation: ticker 20s linear infinite; display: inline-block; }
 @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
@@ -79,7 +79,7 @@ header { position: relative; z-index: 10; background: var(–bg2); border-bottom
 /* TABS */
 .tabs { position: relative; z-index: 10; display: flex; background: var(–bg2); border-bottom: 1px solid var(–border2); overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tabs::-webkit-scrollbar { display: none; }
-.tab { flex-shrink: 0; padding: .78rem .7rem; border: none; border-bottom: 3px solid transparent; background: transparent; color: var(–muted); font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .75rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: .2rem; min-width: 58px; }
+.tab { flex-shrink: 0; padding: .78rem .7rem; border: none; border-bottom: 3px solid transparent; background: transparent; color: var(–muted); font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .75rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: .2rem; min-width: 58px; }
 .tab .ti { font-size: .95rem; }
 .tab:hover { color: var(–text); }
 .tab.active { color: var(–red); border-bottom-color: var(–red); }
@@ -92,17 +92,17 @@ main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
 /* ISSUE HEADER */
 .issue-header { border: 1.5px solid var(–red); border-radius: 3px; margin-bottom: 1.2rem; overflow: hidden; }
 .issue-header-top { background: var(–red); padding: .38rem .9rem; display: flex; align-items: center; justify-content: space-between; }
-.issue-num { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.85); }
+.issue-num { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.85); }
 .issue-body { background: var(–redl); padding: .75rem .9rem; font-size: .82rem; color: #7a3a3a; line-height: 1.55; font-style: italic; }
 .issue-body strong { color: var(–red); font-style: normal; }
 
 /* SECTION DIVIDER */
 .sec-divider { display: flex; align-items: center; gap: .6rem; margin-bottom: .85rem; }
 .sec-line { flex: 1; height: 1px; background: var(–border2); }
-.sec-title { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .65rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); white-space: nowrap; }
+.sec-title { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .65rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); white-space: nowrap; }
 
 /* TASK CARD */
-.task-card { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–muted2); border-radius: 3px; padding: .8rem .95rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .8rem; cursor: pointer; transition: all .2s; user-select: none; -webkit-tap-highlight-color: transparent; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.task-card { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–muted2); border-radius: 3px; padding: .8rem .95rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .8rem; cursor: pointer; transition: all .2s; user-select: none; -webkit-tap-highlight-color: transparent; box-shadow: 0 2px 8px rgba(0,0,0,.10); }
 .task-card:hover { background: var(–bg3); border-left-color: var(–muted); }
 .task-card.done { background: var(–greenl); border-left-color: var(–green); border-color: rgba(46,125,79,.2); }
 .task-card.done .task-title { text-decoration: line-through; color: var(–muted); }
@@ -113,7 +113,7 @@ main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
 .task-body { flex: 1; min-width: 0; }
 .task-title { font-size: .92rem; font-weight: 600; color: var(–text); line-height: 1.2; }
 .task-desc { font-size: .72rem; color: var(–muted); margin-top: .15rem; }
-.task-status { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(–muted2); flex-shrink: 0; }
+.task-status { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(–muted2); flex-shrink: 0; }
 .task-card.done .task-status { color: var(–green); }
 .task-del { font-size: .7rem; color: var(–muted2); flex-shrink: 0; padding: .2rem .3rem; cursor: pointer; opacity: 0; transition: opacity .15s; background: none; border: none; }
 .task-card:hover .task-del { opacity: 1; }
@@ -121,7 +121,7 @@ main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
 
 /* ADD FORM */
 .add-form { margin-top: 1.4rem; border: 1px solid var(–border2); border-radius: 3px; overflow: hidden; }
-.add-form-header { background: var(–bg3); padding: .5rem .95rem; border-bottom: 1px solid var(–border); font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); display: flex; align-items: center; gap: .4rem; }
+.add-form-header { background: var(–bg3); padding: .5rem .95rem; border-bottom: 1px solid var(–border); font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); display: flex; align-items: center; gap: .4rem; }
 .add-form-header::before { content: ‘//’; color: var(–red); }
 .add-form-body { padding: .85rem; background: var(–bg2); }
 .emoji-row { display: flex; gap: .3rem; flex-wrap: wrap; margin-bottom: .7rem; }
@@ -131,40 +131,40 @@ main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
 .add-input { flex: 1; background: var(–bg3); border: 1px solid var(–border2); color: var(–text); padding: .58rem .85rem; border-radius: 3px; font-family: ‘Barlow’, sans-serif; font-size: .88rem; outline: none; transition: border-color .2s; }
 .add-input:focus { border-color: var(–red); background: #fff; }
 .add-input::placeholder { color: var(–muted2); font-style: italic; }
-.add-btn { background: var(–red); color: #fff; border: none; padding: .58rem 1rem; border-radius: 3px; font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+.add-btn { background: var(–red); color: #fff; border: none; padding: .58rem 1rem; border-radius: 3px; font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; flex-shrink: 0; }
 .add-btn:hover { background: var(–red2); }
-.reset-btn { width: 100%; margin-top: 1.2rem; background: transparent; border: 1px solid var(–border2); color: var(–muted); padding: .58rem; border-radius: 3px; font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; transition: all .2s; }
+.reset-btn { width: 100%; margin-top: 1.2rem; background: transparent; border: 1px solid var(–border2); color: var(–muted); padding: .58rem; border-radius: 3px; font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; transition: all .2s; }
 .reset-btn:hover { border-color: var(–muted); color: var(–text); }
 
 /* 10KM PLAN */
 .plan-hero { background: var(–red); border-radius: 3px; padding: 1.1rem 1.2rem; margin-bottom: 1.2rem; position: relative; overflow: hidden; }
-.plan-hero::after { content: ‘10K’; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 5rem; font-weight: 700; color: rgba(255,255,255,.08); line-height: 1; pointer-events: none; }
-.plan-hero-label { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.65); margin-bottom: .3rem; }
-.plan-hero-title { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 1.35rem; font-weight: 700; color: #fff; line-height: 1.1; }
+.plan-hero::after { content: ‘10K’; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 5rem; font-weight: 700; color: rgba(255,255,255,.08); line-height: 1; pointer-events: none; }
+.plan-hero-label { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.65); margin-bottom: .3rem; }
+.plan-hero-title { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 1.35rem; font-weight: 700; color: #fff; line-height: 1.1; }
 .plan-hero-sub { font-size: .8rem; color: rgba(255,255,255,.7); margin-top: .4rem; }
 
 .current-week-banner { background: var(–redl); border: 1.5px solid rgba(196,26,26,.2); border-radius: 3px; padding: .65rem .95rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: .75rem; }
 .cwb-icon { font-size: 1.3rem; flex-shrink: 0; }
 .cwb-body { flex: 1; }
-.cwb-label { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .6rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(–red); margin-bottom: .15rem; }
+.cwb-label { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .6rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(–red); margin-bottom: .15rem; }
 .cwb-title { font-size: .88rem; font-weight: 600; color: var(–text); }
 
 .plan-progress-wrap { margin-bottom: .5rem; }
 .plan-week-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .45rem; }
-.plan-week-label { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .65rem; font-weight: 600; letter-spacing: .08em; color: var(–muted); width: 55px; flex-shrink: 0; text-transform: uppercase; }
+.plan-week-label { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .65rem; font-weight: 600; letter-spacing: .08em; color: var(–muted); width: 55px; flex-shrink: 0; text-transform: uppercase; }
 .plan-week-bar-outer { flex: 1; height: 6px; background: var(–border2); border-radius: 3px; overflow: hidden; }
 .plan-week-bar-inner { height: 100%; border-radius: 3px; transition: width .5s ease; }
-.plan-week-km { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .68rem; font-weight: 600; color: var(–muted); width: 40px; text-align: right; flex-shrink: 0; }
+.plan-week-km { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .68rem; font-weight: 600; color: var(–muted); width: 40px; text-align: right; flex-shrink: 0; }
 
 .week-card { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–muted2); border-radius: 3px; margin-bottom: .6rem; overflow: hidden; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.04); transition: border-left-color .2s; }
 .week-card.current { border-left-color: var(–red); }
 .week-card.done-week { border-left-color: var(–green); background: var(–greenl); }
 .week-card-header { display: flex; align-items: center; gap: .75rem; padding: .72rem .95rem; }
-.week-num { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; background: var(–bg3); color: var(–muted); padding: .18rem .5rem; border-radius: 2px; flex-shrink: 0; }
+.week-num { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; background: var(–bg3); color: var(–muted); padding: .18rem .5rem; border-radius: 2px; flex-shrink: 0; }
 .week-card.current .week-num { background: var(–red); color: #fff; }
 .week-card.done-week .week-num { background: var(–green); color: #fff; }
 .week-title { font-weight: 700; font-size: .88rem; flex: 1; }
-.week-dist { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .82rem; font-weight: 600; color: var(–muted); flex-shrink: 0; }
+.week-dist { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .82rem; font-weight: 600; color: var(–muted); flex-shrink: 0; }
 .week-card.current .week-dist { color: var(–red); }
 .week-chevron { color: var(–muted2); font-size: .65rem; flex-shrink: 0; transition: transform .2s; }
 
@@ -172,11 +172,11 @@ main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
 .week-card.open .week-body { display: block; }
 .session-row { display: flex; align-items: flex-start; gap: .7rem; padding: .62rem .95rem; border-bottom: 1px solid var(–border); }
 .session-row:last-child { border-bottom: none; }
-.session-day { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(–muted); width: 28px; flex-shrink: 0; margin-top: .1rem; }
+.session-day { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(–muted); width: 28px; flex-shrink: 0; margin-top: .1rem; }
 .session-body { flex: 1; }
 .session-title { font-size: .87rem; font-weight: 600; color: var(–text); line-height: 1.2; }
 .session-desc { font-size: .73rem; color: var(–muted); margin-top: .15rem; line-height: 1.4; }
-.session-tag { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .18rem .5rem; border-radius: 2px; flex-shrink: 0; margin-top: .1rem; }
+.session-tag { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .18rem .5rem; border-radius: 2px; flex-shrink: 0; margin-top: .1rem; }
 .tag-easy  { background: #e8f4ea; color: var(–green); }
 .tag-tempo { background: var(–redl); color: var(–red); }
 .tag-long  { background: #e8edf8; color: var(–blue); }
@@ -185,20 +185,20 @@ main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
 
 /* LOG */
 .streak-hero { border: 1.5px solid var(–red); border-radius: 3px; margin-bottom: 1.2rem; overflow: hidden; }
-.streak-hero-top { background: var(–red); padding: .42rem 1rem; font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.85); }
+.streak-hero-top { background: var(–red); padding: .42rem 1rem; font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.85); }
 .streak-hero-body { background: var(–bg2); display: flex; flex-direction: column; align-items: center; padding: 1.4rem; }
-.streak-num { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 4.5rem; font-weight: 700; color: var(–red); line-height: 1; text-shadow: 2px 2px 0 rgba(196,26,26,.1); }
-.streak-sub { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .7rem; font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); margin-top: .2rem; }
+.streak-num { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 4.5rem; font-weight: 700; color: var(–red); line-height: 1; text-shadow: 2px 2px 0 rgba(196,26,26,.1); }
+.streak-sub { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .7rem; font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); margin-top: .2rem; }
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-bottom: 1.2rem; }
-.stat-box { background: var(–card); border: 1px solid var(–border2); border-radius: 3px; padding: .9rem; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
-.stat-num { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 2rem; font-weight: 700; color: var(–text); line-height: 1; }
+.stat-box { background: var(–card); border: 1px solid var(–border2); border-radius: 3px; padding: .9rem; box-shadow: 0 2px 8px rgba(0,0,0,.10); }
+.stat-num { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 2rem; font-weight: 700; color: var(–text); line-height: 1; }
 .stat-lbl { font-size: .72rem; color: var(–muted); margin-top: .25rem; }
 .week-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: .4rem; margin-bottom: 1.2rem; }
-.wday { aspect-ratio: 1; border-radius: 3px; border: 1px solid var(–border2); background: var(–card); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 600; letter-spacing: .05em; color: var(–muted2); text-transform: uppercase; gap: .2rem; }
+.wday { aspect-ratio: 1; border-radius: 3px; border: 1px solid var(–border2); background: var(–card); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 600; letter-spacing: .05em; color: var(–muted2); text-transform: uppercase; gap: .2rem; }
 .wday.done { background: var(–greenl); border-color: rgba(46,125,79,.3); color: var(–green); }
 .wday.today { border-color: var(–red); color: var(–red); background: var(–redl); }
 .wday .dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
-.flavor-box { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–red); border-radius: 3px; padding: .85rem 1rem; font-size: .85rem; color: var(–muted); font-style: italic; line-height: 1.6; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.flavor-box { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–red); border-radius: 3px; padding: .85rem 1rem; font-size: .85rem; color: var(–muted); font-style: italic; line-height: 1.6; box-shadow: 0 2px 8px rgba(0,0,0,.10); }
 .flavor-box strong { color: var(–text); font-style: normal; }
 
 /* CELEBRATION */
@@ -209,14 +209,14 @@ main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
 @keyframes popOut { to{opacity:0;transform:scale(.9) translateY(-8px)} }
 .cel-web-burst { position: absolute; inset: 0; pointer-events: none; opacity: .06; }
 .cel-spidey { width: 76px; height: 76px; position: relative; z-index: 1; }
-.cel-bang { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; background: var(–red); color: #fff; padding: .15rem .6rem; border-radius: 2px; position: relative; z-index: 1; }
-.cel-title { font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 1.45rem; font-weight: 700; color: var(–red); text-align: center; line-height: 1.1; letter-spacing: .03em; text-transform: uppercase; position: relative; z-index: 1; }
+.cel-bang { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; background: var(–red); color: #fff; padding: .15rem .6rem; border-radius: 2px; position: relative; z-index: 1; }
+.cel-title { font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: 1.45rem; font-weight: 700; color: var(–red); text-align: center; line-height: 1.1; letter-spacing: .03em; text-transform: uppercase; position: relative; z-index: 1; }
 .cel-msg { font-size: .83rem; color: var(–muted); text-align: center; line-height: 1.5; font-style: italic; position: relative; z-index: 1; }
 .cel-msg strong { color: var(–text); font-style: normal; }
-.cel-close { background: var(–red); color: #fff; border: none; padding: .5rem 1.5rem; border-radius: 3px; font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; width: 100%; position: relative; z-index: 1; }
+.cel-close { background: var(–red); color: #fff; border: none; padding: .5rem 1.5rem; border-radius: 3px; font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; width: 100%; position: relative; z-index: 1; }
 .cel-close:hover { background: var(–red2); }
 
-.toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(14px); z-index: 190; background: var(–text); color: #fff; font-family: ‘Oswald’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: .5rem 1.2rem; border-radius: 3px; opacity: 0; pointer-events: none; transition: opacity .22s, transform .22s; white-space: nowrap; }
+.toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(14px); z-index: 190; background: var(–text); color: #fff; font-family: ‘Syne’, -apple-system, BlinkMacSystemFont, ‘Helvetica Neue’, sans-serif; font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: .5rem 1.2rem; border-radius: 3px; opacity: 0; pointer-events: none; transition: opacity .22s, transform .22s; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 ::-webkit-scrollbar { width: 3px; }
