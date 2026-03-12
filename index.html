@@ -1,35 +1,691 @@
+<!DOCTYPE html>
 
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Web-Log // Spider-Routine</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+:root {
+–bg:      #f7f5f2;
+–bg2:     #ffffff;
+–bg3:     #f0ede8;
+–card:    #ffffff;
+–red:     #c41a1a;
+–red2:    #e02020;
+–redl:    #fbeaea;
+–blue:    #1a3a8f;
+–text:    #1a1a1a;
+–muted:   #888;
+–muted2:  #bbb;
+–border:  rgba(0,0,0,0.08);
+–border2: rgba(0,0,0,0.14);
+–green:   #2e7d4f;
+–greenl:  #eaf4ee;
+}
 
+html { scroll-behavior: smooth; }
+body {
+background: var(–bg); color: var(–text);
+font-family: ‘Barlow’, sans-serif; min-height: 100vh; overflow-x: hidden;
+}
+body::before {
+content: ‘’; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+background-image: radial-gradient(circle, rgba(0,0,0,.035) 1px, transparent 1px);
+background-size: 20px 20px;
+}
 
+.corner-web { position: fixed; top: 0; right: 0; z-index: 0; width: 220px; height: 220px; pointer-events: none; opacity: .055; }
 
+/* MINI SPIDERMEN */
+.mini-spidey { position: fixed; z-index: 2; pointer-events: none; opacity: .1; }
+.ms-1 { bottom: 90px;  right: 6px;  width: 36px; transform: rotate(12deg); }
+.ms-2 { top: 150px;    left: 4px;   width: 26px; transform: rotate(-18deg) scaleX(-1); }
+.ms-3 { bottom: 220px; left: 8px;   width: 20px; transform: rotate(6deg); }
+.ms-4 { top: 300px;    right: 3px;  width: 16px; transform: rotate(-8deg); }
+.ms-thread { position: fixed; z-index: 1; pointer-events: none; width: 1px; background: rgba(0,0,0,.07); transform-origin: top; }
+.mt-1 { right: 20px; top: 0; height: 100px; transform: rotate(3deg); }
+.mt-2 { left: 16px;  top: 0; height: 170px; transform: rotate(-5deg); }
 
+/* HEADER */
+header { position: relative; z-index: 10; background: var(–bg2); border-bottom: 3px solid var(–red); box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.header-top { display: flex; align-items: stretch; }
+.header-logo-block { background: var(–red); padding: 1rem 2.2rem 1rem 1.2rem; display: flex; align-items: center; justify-content: center; clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%); }
+.header-center { flex: 1; padding: .9rem 1.2rem; }
+.header-eyebrow { font-family: ‘Oswald’, sans-serif; font-size: .58rem; font-weight: 400; letter-spacing: .25em; text-transform: uppercase; color: var(–muted); margin-bottom: .15rem; }
+.header-title { font-family: ‘Oswald’, sans-serif; font-size: 1.55rem; font-weight: 700; line-height: 1; color: var(–text); letter-spacing: .04em; text-transform: uppercase; }
+.header-title .red { color: var(–red); }
+.header-date-block { padding: .9rem 1.1rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; border-left: 1px solid var(–border); }
+.header-date { font-family: ‘Oswald’, sans-serif; font-size: .68rem; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; color: var(–muted); line-height: 1.7; text-align: right; }
+.header-date strong { color: var(–text); font-size: .9rem; display: block; }
+.header-progress { display: flex; align-items: center; gap: .75rem; padding: .55rem 1.2rem; border-top: 1px solid var(–border); background: var(–bg3); }
+.prog-outer { flex: 1; height: 4px; background: var(–border2); position: relative; overflow: hidden; border-radius: 2px; }
+.prog-inner { height: 100%; background: var(–red); transition: width .5s cubic-bezier(.4,0,.2,1); border-radius: 2px; position: relative; }
+.prog-inner::after { content: ‘◆’; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); color: var(–red); font-size: .5rem; }
+.prog-label { font-family: ‘Oswald’, sans-serif; font-size: .72rem; font-weight: 600; color: var(–muted); letter-spacing: .08em; white-space: nowrap; }
+.prog-label strong { color: var(–red); }
 
+/* TICKER */
+.quote-ticker { position: relative; z-index: 10; background: var(–red); padding: .45rem 1.2rem; font-family: ‘Oswald’, sans-serif; font-size: .75rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.92); overflow: hidden; white-space: nowrap; display: flex; align-items: center; gap: 1rem; }
+.ticker-label { background: rgba(0,0,0,.2); padding: .1rem .5rem; border-radius: 2px; font-size: .62rem; letter-spacing: .15em; flex-shrink: 0; }
+.ticker-inner { animation: ticker 20s linear infinite; display: inline-block; }
+@keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
+/* TABS */
+.tabs { position: relative; z-index: 10; display: flex; background: var(–bg2); border-bottom: 1px solid var(–border2); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex-shrink: 0; padding: .78rem .7rem; border: none; border-bottom: 3px solid transparent; background: transparent; color: var(–muted); font-family: ‘Oswald’, sans-serif; font-size: .75rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: .2rem; min-width: 58px; }
+.tab .ti { font-size: .95rem; }
+.tab:hover { color: var(–text); }
+.tab.active { color: var(–red); border-bottom-color: var(–red); }
 
-JOURNAL PERSONNEL · MISSION ACTIVE
-WEB-LOG
+/* MAIN */
+main { position: relative; z-index: 10; padding: 1.2rem 1.2rem 7rem; }
+.section-panel { display: none; }
+.section-panel.active { display: block; }
 
-JOUR 001
+/* ISSUE HEADER */
+.issue-header { border: 1.5px solid var(–red); border-radius: 3px; margin-bottom: 1.2rem; overflow: hidden; }
+.issue-header-top { background: var(–red); padding: .38rem .9rem; display: flex; align-items: center; justify-content: space-between; }
+.issue-num { font-family: ‘Oswald’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.85); }
+.issue-body { background: var(–redl); padding: .75rem .9rem; font-size: .82rem; color: #7a3a3a; line-height: 1.55; font-style: italic; }
+.issue-body strong { color: var(–red); font-style: normal; }
 
-Mission : 0/0
-PARKER
+/* SECTION DIVIDER */
+.sec-divider { display: flex; align-items: center; gap: .6rem; margin-bottom: .85rem; }
+.sec-line { flex: 1; height: 1px; background: var(–border2); }
+.sec-title { font-family: ‘Oswald’, sans-serif; font-size: .65rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); white-space: nowrap; }
 
-⚡
-CORPS
-🔮
-ESPRIT
-📋
-ROUTINE
-🏃
-10 KM
-📊
-BILAN
-SECTION 01 — ENTRAÎNEMENT PHYSIQUE
-0/0
-Parker n'a pas eu son corps grâce à la radioactivité seulement. Il s'entraîne. Chaque jour.
+/* TASK CARD */
+.task-card { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–muted2); border-radius: 3px; padding: .8rem .95rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .8rem; cursor: pointer; transition: all .2s; user-select: none; -webkit-tap-highlight-color: transparent; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.task-card:hover { background: var(–bg3); border-left-color: var(–muted); }
+.task-card.done { background: var(–greenl); border-left-color: var(–green); border-color: rgba(46,125,79,.2); }
+.task-card.done .task-title { text-decoration: line-through; color: var(–muted); }
+.task-card.done .task-emoji { opacity: .35; }
+.check-box { width: 18px; height: 18px; flex-shrink: 0; border: 1.5px solid var(–muted2); border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: .7rem; color: transparent; transition: all .2s; }
+.task-card.done .check-box { background: var(–green); border-color: var(–green); color: #fff; }
+.task-emoji { font-size: 1.1rem; flex-shrink: 0; transition: opacity .2s; }
+.task-body { flex: 1; min-width: 0; }
+.task-title { font-size: .92rem; font-weight: 600; color: var(–text); line-height: 1.2; }
+.task-desc { font-size: .72rem; color: var(–muted); margin-top: .15rem; }
+.task-status { font-family: ‘Oswald’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(–muted2); flex-shrink: 0; }
+.task-card.done .task-status { color: var(–green); }
+.task-del { font-size: .7rem; color: var(–muted2); flex-shrink: 0; padding: .2rem .3rem; cursor: pointer; opacity: 0; transition: opacity .15s; background: none; border: none; }
+.task-card:hover .task-del { opacity: 1; }
+.task-del:hover { color: var(–red) !important; }
 
-NOUVELLE MISSION PHYSIQUE
+/* ADD FORM */
+.add-form { margin-top: 1.4rem; border: 1px solid var(–border2); border-radius: 3px; overflow: hidden; }
+.add-form-header { background: var(–bg3); padding: .5rem .95rem; border-bottom: 1px solid var(–border); font-family: ‘Oswald’, sans-serif; font-size: .62rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); display: flex; align-items: center; gap: .4rem; }
+.add-form-header::before { content: ‘//’; color: var(–red); }
+.add-form-body { padding: .85rem; background: var(–bg2); }
+.emoji-row { display: flex; gap: .3rem; flex-wrap: wrap; margin-bottom: .7rem; }
+.ep { font-size: 1rem; background: var(–bg3); border: 1px solid var(–border2); border-radius: 3px; padding: .28rem .38rem; cursor: pointer; transition: all .15s; line-height: 1; }
+.ep:hover, .ep.sel { border-color: var(–red); background: var(–redl); }
+.add-row { display: flex; gap: .55rem; }
+.add-input { flex: 1; background: var(–bg3); border: 1px solid var(–border2); color: var(–text); padding: .58rem .85rem; border-radius: 3px; font-family: ‘Barlow’, sans-serif; font-size: .88rem; outline: none; transition: border-color .2s; }
+.add-input:focus { border-color: var(–red); background: #fff; }
+.add-input::placeholder { color: var(–muted2); font-style: italic; }
+.add-btn { background: var(–red); color: #fff; border: none; padding: .58rem 1rem; border-radius: 3px; font-family: ‘Oswald’, sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+.add-btn:hover { background: var(–red2); }
+.reset-btn { width: 100%; margin-top: 1.2rem; background: transparent; border: 1px solid var(–border2); color: var(–muted); padding: .58rem; border-radius: 3px; font-family: ‘Oswald’, sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; transition: all .2s; }
+.reset-btn:hover { border-color: var(–muted); color: var(–text); }
 
-+ AJOUTER
-// RESET CORPS
+/* 10KM PLAN */
+.plan-hero { background: var(–red); border-radius: 3px; padding: 1.1rem 1.2rem; margin-bottom: 1.2rem; position: relative; overflow: hidden; }
+.plan-hero::after { content: ‘10K’; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); font-family: ‘Oswald’, sans-serif; font-size: 5rem; font-weight: 700; color: rgba(255,255,255,.08); line-height: 1; pointer-events: none; }
+.plan-hero-label { font-family: ‘Oswald’, sans-serif; font-size: .62rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.65); margin-bottom: .3rem; }
+.plan-hero-title { font-family: ‘Oswald’, sans-serif; font-size: 1.35rem; font-weight: 700; color: #fff; line-height: 1.1; }
+.plan-hero-sub { font-size: .8rem; color: rgba(255,255,255,.7); margin-top: .4rem; }
+
+.current-week-banner { background: var(–redl); border: 1.5px solid rgba(196,26,26,.2); border-radius: 3px; padding: .65rem .95rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: .75rem; }
+.cwb-icon { font-size: 1.3rem; flex-shrink: 0; }
+.cwb-body { flex: 1; }
+.cwb-label { font-family: ‘Oswald’, sans-serif; font-size: .6rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(–red); margin-bottom: .15rem; }
+.cwb-title { font-size: .88rem; font-weight: 600; color: var(–text); }
+
+.plan-progress-wrap { margin-bottom: .5rem; }
+.plan-week-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .45rem; }
+.plan-week-label { font-family: ‘Oswald’, sans-serif; font-size: .65rem; font-weight: 600; letter-spacing: .08em; color: var(–muted); width: 55px; flex-shrink: 0; text-transform: uppercase; }
+.plan-week-bar-outer { flex: 1; height: 6px; background: var(–border2); border-radius: 3px; overflow: hidden; }
+.plan-week-bar-inner { height: 100%; border-radius: 3px; transition: width .5s ease; }
+.plan-week-km { font-family: ‘Oswald’, sans-serif; font-size: .68rem; font-weight: 600; color: var(–muted); width: 40px; text-align: right; flex-shrink: 0; }
+
+.week-card { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–muted2); border-radius: 3px; margin-bottom: .6rem; overflow: hidden; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.04); transition: border-left-color .2s; }
+.week-card.current { border-left-color: var(–red); }
+.week-card.done-week { border-left-color: var(–green); background: var(–greenl); }
+.week-card-header { display: flex; align-items: center; gap: .75rem; padding: .72rem .95rem; }
+.week-num { font-family: ‘Oswald’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; background: var(–bg3); color: var(–muted); padding: .18rem .5rem; border-radius: 2px; flex-shrink: 0; }
+.week-card.current .week-num { background: var(–red); color: #fff; }
+.week-card.done-week .week-num { background: var(–green); color: #fff; }
+.week-title { font-weight: 700; font-size: .88rem; flex: 1; }
+.week-dist { font-family: ‘Oswald’, sans-serif; font-size: .82rem; font-weight: 600; color: var(–muted); flex-shrink: 0; }
+.week-card.current .week-dist { color: var(–red); }
+.week-chevron { color: var(–muted2); font-size: .65rem; flex-shrink: 0; transition: transform .2s; }
+
+.week-body { display: none; border-top: 1px solid var(–border); }
+.week-card.open .week-body { display: block; }
+.session-row { display: flex; align-items: flex-start; gap: .7rem; padding: .62rem .95rem; border-bottom: 1px solid var(–border); }
+.session-row:last-child { border-bottom: none; }
+.session-day { font-family: ‘Oswald’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(–muted); width: 28px; flex-shrink: 0; margin-top: .1rem; }
+.session-body { flex: 1; }
+.session-title { font-size: .87rem; font-weight: 600; color: var(–text); line-height: 1.2; }
+.session-desc { font-size: .73rem; color: var(–muted); margin-top: .15rem; line-height: 1.4; }
+.session-tag { font-family: ‘Oswald’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .18rem .5rem; border-radius: 2px; flex-shrink: 0; margin-top: .1rem; }
+.tag-easy  { background: #e8f4ea; color: var(–green); }
+.tag-tempo { background: var(–redl); color: var(–red); }
+.tag-long  { background: #e8edf8; color: var(–blue); }
+.tag-rest  { background: var(–bg3); color: var(–muted); }
+.tag-race  { background: #fff3e0; color: #c67a00; }
+
+/* LOG */
+.streak-hero { border: 1.5px solid var(–red); border-radius: 3px; margin-bottom: 1.2rem; overflow: hidden; }
+.streak-hero-top { background: var(–red); padding: .42rem 1rem; font-family: ‘Oswald’, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.85); }
+.streak-hero-body { background: var(–bg2); display: flex; flex-direction: column; align-items: center; padding: 1.4rem; }
+.streak-num { font-family: ‘Oswald’, sans-serif; font-size: 4.5rem; font-weight: 700; color: var(–red); line-height: 1; text-shadow: 2px 2px 0 rgba(196,26,26,.1); }
+.streak-sub { font-family: ‘Oswald’, sans-serif; font-size: .7rem; font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: var(–muted); margin-top: .2rem; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-bottom: 1.2rem; }
+.stat-box { background: var(–card); border: 1px solid var(–border2); border-radius: 3px; padding: .9rem; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.stat-num { font-family: ‘Oswald’, sans-serif; font-size: 2rem; font-weight: 700; color: var(–text); line-height: 1; }
+.stat-lbl { font-size: .72rem; color: var(–muted); margin-top: .25rem; }
+.week-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: .4rem; margin-bottom: 1.2rem; }
+.wday { aspect-ratio: 1; border-radius: 3px; border: 1px solid var(–border2); background: var(–card); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: ‘Oswald’, sans-serif; font-size: .58rem; font-weight: 600; letter-spacing: .05em; color: var(–muted2); text-transform: uppercase; gap: .2rem; }
+.wday.done { background: var(–greenl); border-color: rgba(46,125,79,.3); color: var(–green); }
+.wday.today { border-color: var(–red); color: var(–red); background: var(–redl); }
+.wday .dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+.flavor-box { background: var(–card); border: 1px solid var(–border2); border-left: 3px solid var(–red); border-radius: 3px; padding: .85rem 1rem; font-size: .85rem; color: var(–muted); font-style: italic; line-height: 1.6; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.flavor-box strong { color: var(–text); font-style: normal; }
+
+/* CELEBRATION */
+.cel-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.3); display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.cel-popup { background: #fff; border: 2px solid var(–red); border-radius: 4px; padding: 1.5rem 1.75rem 1.25rem; max-width: 280px; width: 90%; display: flex; flex-direction: column; align-items: center; gap: .7rem; pointer-events: all; box-shadow: 0 20px 50px rgba(0,0,0,.15), 0 0 0 1px rgba(196,26,26,.1); animation: popIn .3s cubic-bezier(.34,1.56,.64,1) both; position: relative; overflow: hidden; }
+@keyframes popIn { from{opacity:0;transform:scale(.82) translateY(16px)} to{opacity:1;transform:none} }
+.cel-popup.hiding { animation: popOut .22s ease forwards; }
+@keyframes popOut { to{opacity:0;transform:scale(.9) translateY(-8px)} }
+.cel-web-burst { position: absolute; inset: 0; pointer-events: none; opacity: .06; }
+.cel-spidey { width: 76px; height: 76px; position: relative; z-index: 1; }
+.cel-bang { font-family: ‘Oswald’, sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; background: var(–red); color: #fff; padding: .15rem .6rem; border-radius: 2px; position: relative; z-index: 1; }
+.cel-title { font-family: ‘Oswald’, sans-serif; font-size: 1.45rem; font-weight: 700; color: var(–red); text-align: center; line-height: 1.1; letter-spacing: .03em; text-transform: uppercase; position: relative; z-index: 1; }
+.cel-msg { font-size: .83rem; color: var(–muted); text-align: center; line-height: 1.5; font-style: italic; position: relative; z-index: 1; }
+.cel-msg strong { color: var(–text); font-style: normal; }
+.cel-close { background: var(–red); color: #fff; border: none; padding: .5rem 1.5rem; border-radius: 3px; font-family: ‘Oswald’, sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; width: 100%; position: relative; z-index: 1; }
+.cel-close:hover { background: var(–red2); }
+
+.toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(14px); z-index: 190; background: var(–text); color: #fff; font-family: ‘Oswald’, sans-serif; font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: .5rem 1.2rem; border-radius: 3px; opacity: 0; pointer-events: none; transition: opacity .22s, transform .22s; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(196,26,26,.2); border-radius: 2px; }
+@keyframes flashIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+.fadein { animation: flashIn .2s ease both; }
+</style>
+
+</head>
+<body>
+
+<svg class="corner-web" viewBox="0 0 220 220" fill="none">
+  <g stroke="#cc1a1a" stroke-width="0.9">
+    <line x1="220" y1="0" x2="0" y2="220"/><line x1="220" y1="0" x2="50" y2="220"/>
+    <line x1="220" y1="0" x2="140" y2="220"/><line x1="220" y1="0" x2="220" y2="220"/>
+    <line x1="220" y1="0" x2="0" y2="110"/><line x1="220" y1="0" x2="0" y2="40"/>
+    <path d="M220,35 Q165,70 110,100 Q65,125 30,165"/>
+    <path d="M220,80 Q170,105 120,135 Q80,158 45,195"/>
+    <path d="M190,0 Q175,50 155,95 Q135,138 105,175"/>
+    <path d="M140,0 Q130,45 115,88 Q100,130 75,170"/>
+    <path d="M90,0 Q84,40 72,78 Q60,115 42,152"/>
+  </g>
+</svg>
+
+<!-- Mini Spidermen -->
+
+<div class="mini-spidey ms-1"><svg viewBox="0 0 60 90" fill="none"><ellipse cx="30" cy="38" rx="10" ry="14" fill="#cc1a1a"/><ellipse cx="30" cy="60" rx="8" ry="10" fill="#cc1a1a"/><ellipse cx="30" cy="20" rx="10" ry="11" fill="#cc1a1a"/><ellipse cx="25" cy="18" rx="4" ry="3" fill="white" transform="rotate(-10 25 18)"/><ellipse cx="35" cy="18" rx="4" ry="3" fill="white" transform="rotate(10 35 18)"/><path d="M20 30 Q30 26 40 30" stroke="#8b0000" stroke-width=".8" fill="none"/><path d="M20 36 Q30 32 40 36" stroke="#8b0000" stroke-width=".8" fill="none"/><path d="M20 30 Q14 40 16 54 Q22 58 24 68 Q30 70 36 68 Q38 58 44 54 Q46 40 40 30 Q30 26 20 30Z" fill="#1a3a8f" opacity=".5"/><path d="M20 36 Q8 28 4 18" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M40 36 Q52 28 56 18" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M24 68 Q18 80 14 88" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M36 68 Q42 80 46 88" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div>
+<div class="mini-spidey ms-2"><svg viewBox="0 0 60 90" fill="none"><ellipse cx="30" cy="38" rx="10" ry="14" fill="#cc1a1a"/><ellipse cx="30" cy="60" rx="8" ry="10" fill="#cc1a1a"/><ellipse cx="30" cy="20" rx="10" ry="11" fill="#cc1a1a"/><ellipse cx="25" cy="18" rx="4" ry="3" fill="white" transform="rotate(-10 25 18)"/><ellipse cx="35" cy="18" rx="4" ry="3" fill="white" transform="rotate(10 35 18)"/><path d="M20 30 Q14 40 16 54 Q22 58 24 68 Q30 70 36 68 Q38 58 44 54 Q46 40 40 30 Q30 26 20 30Z" fill="#1a3a8f" opacity=".5"/><path d="M20 36 Q6 22 2 8" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M40 36 Q54 22 58 8" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M24 68 Q20 82 18 88" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M36 68 Q40 82 42 88" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div>
+<div class="mini-spidey ms-3"><svg viewBox="0 0 60 90" fill="none"><ellipse cx="30" cy="38" rx="10" ry="14" fill="#cc1a1a"/><ellipse cx="30" cy="60" rx="8" ry="10" fill="#cc1a1a"/><ellipse cx="30" cy="20" rx="10" ry="11" fill="#cc1a1a"/><ellipse cx="25" cy="18" rx="4" ry="3" fill="white" transform="rotate(-10 25 18)"/><ellipse cx="35" cy="18" rx="4" ry="3" fill="white" transform="rotate(10 35 18)"/><path d="M20 30 Q14 40 16 54 Q22 58 24 68 Q30 70 36 68 Q38 58 44 54 Q46 40 40 30 Q30 26 20 30Z" fill="#1a3a8f" opacity=".5"/><path d="M20 36 Q10 44 4 52" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M40 36 Q50 30 56 22" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M24 68 Q16 78 12 86" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M36 68 Q44 78 48 86" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div>
+<div class="mini-spidey ms-4"><svg viewBox="0 0 60 90" fill="none"><ellipse cx="30" cy="38" rx="10" ry="14" fill="#cc1a1a"/><ellipse cx="30" cy="60" rx="8" ry="10" fill="#cc1a1a"/><ellipse cx="30" cy="20" rx="10" ry="11" fill="#cc1a1a"/><ellipse cx="25" cy="18" rx="4" ry="3" fill="white" transform="rotate(-10 25 18)"/><ellipse cx="35" cy="18" rx="4" ry="3" fill="white" transform="rotate(10 35 18)"/><path d="M20 30 Q14 40 16 54 Q22 58 24 68 Q30 70 36 68 Q38 58 44 54 Q46 40 40 30 Q30 26 20 30Z" fill="#1a3a8f" opacity=".5"/><path d="M20 36 Q8 36 2 30" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M40 36 Q52 36 58 30" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M24 68 Q20 80 18 88" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M36 68 Q40 80 42 88" stroke="#cc1a1a" stroke-width="4" stroke-linecap="round" fill="none"/></svg></div>
+<div class="ms-thread mt-1"></div><div class="ms-thread mt-2"></div>
+
+<!-- Celebration popup -->
+
+<div class="cel-overlay" id="celOverlay" style="display:none;">
+  <div class="cel-popup" id="celPopup">
+    <svg class="cel-web-burst" viewBox="0 0 280 200" fill="none"><g stroke="#cc1a1a" stroke-width="1"><line x1="140" y1="100" x2="0" y2="0"/><line x1="140" y1="100" x2="70" y2="0"/><line x1="140" y1="100" x2="140" y2="0"/><line x1="140" y1="100" x2="210" y2="0"/><line x1="140" y1="100" x2="280" y2="0"/><line x1="140" y1="100" x2="280" y2="60"/><line x1="140" y1="100" x2="280" y2="140"/><line x1="140" y1="100" x2="280" y2="200"/><line x1="140" y1="100" x2="140" y2="200"/><line x1="140" y1="100" x2="0" y2="200"/><line x1="140" y1="100" x2="0" y2="120"/><line x1="140" y1="100" x2="0" y2="60"/><path d="M60,0 Q100,30 140,0 Q180,30 220,0"/><path d="M20,35 Q80,62 140,45 Q200,62 260,35"/><path d="M0,75 Q60,95 140,82 Q220,95 280,75"/><path d="M0,118 Q60,132 140,124 Q220,132 280,118"/><path d="M18,160 Q78,168 140,162 Q202,168 262,160"/></g></svg>
+    <div class="cel-bang" id="celBang">Mission</div>
+    <svg class="cel-spidey" viewBox="0 0 80 120" fill="none">
+      <ellipse cx="40" cy="50" rx="13" ry="18" fill="#cc1a1a"/><ellipse cx="40" cy="78" rx="11" ry="13" fill="#cc1a1a"/>
+      <ellipse cx="40" cy="26" rx="13" ry="14" fill="#cc1a1a"/>
+      <ellipse cx="33" cy="23" rx="5.5" ry="4" fill="white" transform="rotate(-12 33 23)"/>
+      <ellipse cx="47" cy="23" rx="5.5" ry="4" fill="white" transform="rotate(12 47 23)"/>
+      <path d="M27 40 Q40 35 53 40" stroke="#8b0000" stroke-width="1" fill="none"/>
+      <path d="M27 48 Q40 43 53 48" stroke="#8b0000" stroke-width="1" fill="none"/>
+      <path d="M29 57 Q40 52 51 57" stroke="#8b0000" stroke-width="1" fill="none"/>
+      <path d="M27 40 Q20 52 22 68 Q30 74 32 88 Q40 92 48 88 Q50 74 58 68 Q60 52 53 40 Q40 35 27 40Z" fill="#1a3a8f" opacity=".6"/>
+      <path d="M27 46 Q12 28 4 8" stroke="#cc1a1a" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M53 46 Q68 28 76 8" stroke="#cc1a1a" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M4 8 Q2 2 0 0" stroke="#1a3a8f" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".7"/>
+      <path d="M76 8 Q78 2 80 0" stroke="#1a3a8f" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".7"/>
+      <path d="M33 90 Q24 106 18 118" stroke="#cc1a1a" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M47 90 Q56 106 62 118" stroke="#cc1a1a" stroke-width="5" stroke-linecap="round" fill="none"/>
+    </svg>
+    <div class="cel-title" id="celTitle">Bien joué !</div>
+    <div class="cel-msg" id="celMsg">Tu avances.</div>
+    <button class="cel-close" onclick="closeCel()">OK, on continue !</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+
+<header>
+  <div class="header-top">
+    <div class="header-logo-block">
+      <svg width="34" height="34" viewBox="0 0 60 60" fill="none">
+        <ellipse cx="30" cy="28" rx="9" ry="12" fill="white"/><ellipse cx="30" cy="44" rx="7" ry="9" fill="white"/>
+        <ellipse cx="30" cy="14" rx="9" ry="10" fill="white"/>
+        <ellipse cx="24" cy="12" rx="4" ry="3" fill="#cc1a1a" transform="rotate(-10 24 12)"/>
+        <ellipse cx="36" cy="12" rx="4" ry="3" fill="#cc1a1a" transform="rotate(10 36 12)"/>
+        <path d="M21 22 Q30 18 39 22" stroke="rgba(0,0,0,.2)" stroke-width=".8" fill="none"/>
+        <path d="M21 22 Q14 30 16 42 Q22 46 24 54 Q30 56 36 54 Q38 46 44 42 Q46 30 39 22 Q30 18 21 22Z" fill="rgba(26,58,143,.35)"/>
+        <path d="M21 28 Q8 22 3 12" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M39 28 Q52 22 57 12" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M24 54 Q18 60 14 66" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path d="M36 54 Q42 60 46 66" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-center">
+      <div class="header-eyebrow">Journal personnel · Mission active</div>
+      <div class="header-title"><span class="red">Web</span>-Log</div>
+    </div>
+    <div class="header-date-block">
+      <div class="header-date">
+        <strong id="dateDay"></strong>
+        <span id="dateRest"></span>
+        Jour <span id="dayNum">001</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-progress">
+    <div class="prog-outer"><div class="prog-inner" id="progressBar" style="width:0%"></div></div>
+    <div class="prog-label">Mission : <strong id="progText">0/0</strong></div>
+  </div>
+</header>
+
+<div class="quote-ticker">
+  <span class="ticker-label">Parker</span>
+  <span class="ticker-inner" id="tickerInner"></span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('sport')" id="tab-sport"><span class="ti">⚡</span>Corps</button>
+  <button class="tab" onclick="showTab('spirit')" id="tab-spirit"><span class="ti">🔮</span>Esprit</button>
+  <button class="tab" onclick="showTab('routine')" id="tab-routine"><span class="ti">📋</span>Routine</button>
+  <button class="tab" onclick="showTab('run')" id="tab-run"><span class="ti">🏃</span>10 km</button>
+  <button class="tab" onclick="showTab('log')" id="tab-log"><span class="ti">📊</span>Bilan</button>
+</div>
+
+<main>
+
+<div id="panel-sport" class="section-panel active">
+  <div class="issue-header">
+    <div class="issue-header-top"><span class="issue-num">Section 01 — Entraînement physique</span><span class="issue-num" id="sport-count">0/0</span></div>
+    <div class="issue-body">Parker n'a pas eu son corps grâce à la radioactivité seulement. <strong>Il s'entraîne. Chaque jour.</strong></div>
+  </div>
+  <div id="sport-list"></div>
+  <div class="add-form">
+    <div class="add-form-header">Nouvelle mission physique</div>
+    <div class="add-form-body">
+      <div class="emoji-row" id="ep-sport"></div>
+      <div class="add-row"><input class="add-input" id="sport-input" placeholder="Ajouter un exercice..."/><button class="add-btn" onclick="addTask('sport')">+ Ajouter</button></div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetSection('sport')">// Reset corps</button>
+</div>
+
+<div id="panel-spirit" class="section-panel">
+  <div class="issue-header">
+    <div class="issue-header-top"><span class="issue-num">Section 02 — Pratique spirituelle</span><span class="issue-num" id="spirit-count">0/0</span></div>
+    <div class="issue-body">Ce qui fait un héros, c'est pas la force — c'est ce qu'il choisit de faire avec. <strong>La foi tient tout ensemble.</strong></div>
+  </div>
+  <div id="spirit-list"></div>
+  <div class="add-form">
+    <div class="add-form-header">Nouvelle pratique</div>
+    <div class="add-form-body">
+      <div class="emoji-row" id="ep-spirit"></div>
+      <div class="add-row"><input class="add-input" id="spirit-input" placeholder="Ajouter une pratique..."/><button class="add-btn" onclick="addTask('spirit')" style="background:#1a3a8f;">+ Ajouter</button></div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetSection('spirit')">// Reset esprit</button>
+</div>
+
+<div id="panel-routine" class="section-panel">
+  <div class="issue-header">
+    <div class="issue-header-top"><span class="issue-num">Section 03 — Habitudes quotidiennes</span><span class="issue-num" id="routine-count">0/0</span></div>
+    <div class="issue-body">Parker va au lycée, sauve New York, et fait sa lessive. <strong>Les petites routines sont le socle de tout.</strong></div>
+  </div>
+  <div id="routine-list"></div>
+  <div class="add-form">
+    <div class="add-form-header">Nouvelle habitude</div>
+    <div class="add-form-body">
+      <div class="emoji-row" id="ep-routine"></div>
+      <div class="add-row"><input class="add-input" id="routine-input" placeholder="Ajouter une habitude..."/><button class="add-btn" onclick="addTask('routine')" style="background:#444;">+ Ajouter</button></div>
+    </div>
+  </div>
+  <button class="reset-btn" onclick="resetSection('routine')">// Reset routine</button>
+</div>
+
+<div id="panel-run" class="section-panel">
+  <div class="plan-hero">
+    <div class="plan-hero-label">Objectif · Débutant · 16 semaines</div>
+    <div class="plan-hero-title">De 0 à 10 kilomètres</div>
+    <div class="plan-hero-sub">3 séances / semaine · Progression douce · Course prévue fin S16</div>
+  </div>
+  <div id="currentWeekBanner"></div>
+  <div class="sec-divider"><div class="sec-line"></div><div class="sec-title">Progression par phase</div><div class="sec-line"></div></div>
+  <div class="plan-progress-wrap" id="planProgressWrap"></div>
+  <div class="sec-divider" style="margin-top:1.4rem;"><div class="sec-line"></div><div class="sec-title">Programme semaine par semaine</div><div class="sec-line"></div></div>
+  <div id="weekCards"></div>
+</div>
+
+<div id="panel-log" class="section-panel">
+  <div class="streak-hero">
+    <div class="streak-hero-top">// Série active</div>
+    <div class="streak-hero-body">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-sub">jours consécutifs · <span id="streakLabel">commence aujourd'hui</span></div>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="statDone">0</div><div class="stat-lbl">tâches aujourd'hui</div></div>
+    <div class="stat-box"><div class="stat-num" id="statPct">0%</div><div class="stat-lbl">complétion du jour</div></div>
+  </div>
+  <div class="sec-divider"><div class="sec-line"></div><div class="sec-title">7 derniers jours</div><div class="sec-line"></div></div>
+  <div class="week-grid" id="weekGrid"></div>
+  <div class="flavor-box" id="flavorBox"></div>
+</div>
+
+</main>
+
+<script>
+const QUOTES = [
+  "With great power comes great responsibility.  ·  With great power comes great responsibility.  ·  With great power comes great responsibility.  ·  ",
+  "I've been me my whole life and I've had powers for six months. I'm still figuring this out.  ·  I've been me my whole life and I've had powers for six months.  ·  ",
+  "It's not about how hard you can hit. It's about taking the hit and moving forward.  ·  It's not about how hard you can hit. It's about taking the hit and moving forward.  ·  ",
+  "Part of being Spider-Man is not knowing what's coming next.  ·  Part of being Spider-Man is not knowing what's coming next.  ·  ",
+  "Anyone can wear the mask.  ·  Anyone can wear the mask.  ·  Anyone can wear the mask.  ·  Anyone can wear the mask.  ·  ",
+];
+
+const EMOJIS = {
+  sport:   ['⚡','💪','🏃','🧘','🥊','🚴','🏋️','🤸','🧗','🏊'],
+  spirit:  ['🙏','📖','✝️','☪️','✡️','🕯️','☮️','💫','🌄','🗺️'],
+  routine: ['💧','😴','🥗','📝','🧹','🎵','🌅','📵','🛁','☀️'],
+};
+
+const DEFAULTS = {
+  sport: [
+    { id:1, emoji:'💪', title:'Pompes — 3 séries de 10', desc:'Pause 60s entre chaque série', done:false },
+    { id:2, emoji:'🏃', title:'Course ou marche 20 min', desc:'Dehors, pas de téléphone', done:false },
+    { id:3, emoji:'🧘', title:'Étirements 5 min', desc:'Le soir, avant de dormir', done:false },
+    { id:4, emoji:'🏋️', title:'Squats — 20 reps', done:false },
+  ],
+  spirit: [
+    { id:1, emoji:'🙏', title:'Prière du matin', desc:'Avant tout le reste', done:false },
+    { id:2, emoji:'📖', title:'Lecture 10 min', desc:'Texte sacré ou réflexion', done:false },
+    { id:3, emoji:'🕯️', title:'Gratitude — 3 choses', desc:'Ce pour quoi tu es reconnaissant', done:false },
+    { id:4, emoji:'🙏', title:'Prière du soir', done:false },
+  ],
+  routine: [
+    { id:1, emoji:'💧', title:"Verre d'eau au réveil", desc:'Avant le téléphone', done:false },
+    { id:2, emoji:'😴', title:"Au lit à l'heure", desc:'Le sommeil reconstruit', done:false },
+    { id:3, emoji:'🌅', title:'10 min dehors', desc:'Lumière naturelle', done:false },
+  ],
+};
+
+const PLAN = [
+  { w:1,  title:'Mise en route',          dist:'~6 km',  sessions:[
+    { day:'Lun', title:'Marche rapide 20 min',            desc:'Pas de course. Rythme confortable, respirer.', tag:'tag-rest' },
+    { day:'Mer', title:'Course/marche alternée 20 min',   desc:'1 min course / 2 min marche × 6', tag:'tag-easy' },
+    { day:'Sam', title:'Marche active 25 min',            desc:'Terrain plat. Écouter son corps.', tag:'tag-rest' },
+  ]},
+  { w:2,  title:'Premiers pas',           dist:'~8 km',  sessions:[
+    { day:'Lun', title:'Course/marche 25 min',            desc:'1 min course / 2 min marche × 7', tag:'tag-easy' },
+    { day:'Jeu', title:'Course/marche 25 min',            desc:'Même ratio. Rester à l\'aise.', tag:'tag-easy' },
+    { day:'Sam', title:'Marche longue 30 min',            desc:'Endurance de base.', tag:'tag-rest' },
+  ]},
+  { w:3,  title:'On allonge un peu',      dist:'~9 km',  sessions:[
+    { day:'Mar', title:'Course/marche 28 min',            desc:'2 min course / 2 min marche × 6', tag:'tag-easy' },
+    { day:'Jeu', title:'Course/marche 28 min',            desc:'Focus sur la respiration.', tag:'tag-easy' },
+    { day:'Dim', title:'Sortie longue 35 min',            desc:'Mixte. Finir sans être épuisé.', tag:'tag-long' },
+  ]},
+  { w:4,  title:'Semaine de récup',       dist:'~6 km',  sessions:[
+    { day:'Mar', title:'Course légère 20 min',            desc:'2 min course / 2 min marche. Facile.', tag:'tag-rest' },
+    { day:'Ven', title:'Marche active 25 min',            desc:'Récupération active.', tag:'tag-rest' },
+    { day:'Dim', title:'Étirements + marche 20 min',      desc:'Corps au calme.', tag:'tag-rest' },
+  ]},
+  { w:5,  title:'Cap les 3 km',           dist:'~11 km', sessions:[
+    { day:'Lun', title:'Course 25 min continu',           desc:'3 min course / 1 min marche × 5', tag:'tag-easy' },
+    { day:'Mer', title:'Tempo léger 20 min',              desc:'Rythme un peu plus soutenu.', tag:'tag-tempo' },
+    { day:'Sam', title:'Sortie longue 40 min',            desc:'Alternance libre. Tenir la durée.', tag:'tag-long' },
+  ]},
+  { w:6,  title:'Endurance de base',      dist:'~12 km', sessions:[
+    { day:'Mar', title:'Course 28 min continu',           desc:'5 min course / 1 min marche × 4', tag:'tag-easy' },
+    { day:'Jeu', title:'Fractionné court',                desc:'6 × (1 min vite / 2 min marche)', tag:'tag-tempo' },
+    { day:'Dim', title:'Sortie longue 45 min',            desc:'Allure endurance. Hydrate-toi.', tag:'tag-long' },
+  ]},
+  { w:7,  title:'30 min sans s\'arrêter', dist:'~13 km', sessions:[
+    { day:'Lun', title:'Course 30 min continu',           desc:'Objectif : ne pas s\'arrêter. Ralentis si besoin.', tag:'tag-easy' },
+    { day:'Mer', title:'Fractionné 25 min',               desc:'5 × (2 min vite / 2 min récup)', tag:'tag-tempo' },
+    { day:'Sam', title:'Sortie longue 50 min',            desc:'Allure lente. Le corps s\'adapte.', tag:'tag-long' },
+  ]},
+  { w:8,  title:'Semaine de récup',       dist:'~8 km',  sessions:[
+    { day:'Mar', title:'Course légère 25 min',            desc:'Allure très confortable.', tag:'tag-rest' },
+    { day:'Ven', title:'Marche + étirements 30 min',      desc:'Corps au repos actif.', tag:'tag-rest' },
+    { day:'Dim', title:'Jogging tranquille 20 min',       desc:'Maintenir l\'habitude.', tag:'tag-rest' },
+  ]},
+  { w:9,  title:'Cap les 5 km',           dist:'~14 km', sessions:[
+    { day:'Lun', title:'Course 35 min continu',           desc:'Rythme endurance. 5 km dans les pattes.', tag:'tag-easy' },
+    { day:'Mer', title:'Fractionné 28 min',               desc:'5 × (3 min vite / 2 min récup)', tag:'tag-tempo' },
+    { day:'Sam', title:'Sortie longue 55 min',            desc:'Découvrir un nouveau parcours.', tag:'tag-long' },
+  ]},
+  { w:10, title:'Solidifier la base',     dist:'~15 km', sessions:[
+    { day:'Mar', title:'Course 38 min continu',           desc:'Allure stable, respiration nasale.', tag:'tag-easy' },
+    { day:'Jeu', title:'Fractionné 30 min',               desc:'6 × (3 min vite / 2 min récup)', tag:'tag-tempo' },
+    { day:'Dim', title:'Sortie longue 60 min',            desc:'1 heure ! Hydrate-toi bien.', tag:'tag-long' },
+  ]},
+  { w:11, title:'Intensité montante',     dist:'~16 km', sessions:[
+    { day:'Lun', title:'Course 40 min continu',           desc:'Rythme constant. Pas de marche.', tag:'tag-easy' },
+    { day:'Mer', title:'Tempo 30 min',                    desc:'Effort modéré-soutenu sur 30 min.', tag:'tag-tempo' },
+    { day:'Sam', title:'Sortie longue 65 min',            desc:'Environ 7 km. Bien récupérer.', tag:'tag-long' },
+  ]},
+  { w:12, title:'Semaine de récup',       dist:'~10 km', sessions:[
+    { day:'Mar', title:'Course légère 30 min',            desc:'Très facile. Profiter.', tag:'tag-rest' },
+    { day:'Ven', title:'Jogging 25 min',                  desc:'Sans pression.', tag:'tag-rest' },
+    { day:'Dim', title:'Marche longue 40 min',            desc:'Récupération active.', tag:'tag-rest' },
+  ]},
+  { w:13, title:'Phase finale — allure',  dist:'~18 km', sessions:[
+    { day:'Lun', title:'Course 42 min continu',           desc:'Rythme cible 10 km : ≈ 7–8 min/km', tag:'tag-easy' },
+    { day:'Mer', title:'Fractionné avancé',               desc:'4 × (5 min vite / 3 min récup)', tag:'tag-tempo' },
+    { day:'Sam', title:'Sortie longue 70 min',            desc:'Environ 8 km. Allure course.', tag:'tag-long' },
+  ]},
+  { w:14, title:'Affûtage',               dist:'~17 km', sessions:[
+    { day:'Mar', title:'Course 40 min allure race',       desc:'Simuler le rythme du 10 km.', tag:'tag-tempo' },
+    { day:'Jeu', title:'Fractionné court',                desc:'6 × (2 min vite / 2 min récup)', tag:'tag-tempo' },
+    { day:'Dim', title:'Sortie longue 65 min',            desc:'8 km. Dernière longue sortie.', tag:'tag-long' },
+  ]},
+  { w:15, title:'Semaine légère',         dist:'~12 km', sessions:[
+    { day:'Lun', title:'Course légère 35 min',            desc:'Garder les jambes. Allure endurance.', tag:'tag-rest' },
+    { day:'Mer', title:'Fractionné court 20 min',         desc:'4 × (1 min vite / 2 min récup)', tag:'tag-rest' },
+    { day:'Sam', title:'Jogging 25 min tranquille',       desc:'Dernière sortie avant la course.', tag:'tag-rest' },
+  ]},
+  { w:16, title:'🏁 Semaine de course !', dist:'10+ km', sessions:[
+    { day:'Lun', title:'Jogging léger 20 min',            desc:'Garder les jambes actives. Pas d\'effort.', tag:'tag-rest' },
+    { day:'Mer', title:'Strides 15 min',                  desc:'10 min échauff. + 5 × 20s rapide', tag:'tag-rest' },
+    { day:'Dim', title:'🏁 10 KILOMÈTRES !',              desc:'C\'est pour ça que tu t\'es entraîné. Tu es prêt.', tag:'tag-race' },
+  ]},
+];
+
+// STATE
+let state = null;
+try { state = JSON.parse(localStorage.getItem('weblog-v3') || 'null'); } catch(e){}
+if (!state) {
+  state = { tasks: JSON.parse(JSON.stringify(DEFAULTS)), streak:0, lastDate:'', history:[], nextId:{sport:20,spirit:20,routine:20}, startDate:new Date().toDateString(), currentWeek:1 };
+}
+const todayStr = new Date().toDateString();
+if (state.lastDate && state.lastDate !== todayStr) {
+  const all = allTasks();
+  const pct = all.length ? Math.round(all.filter(t=>t.done).length/all.length*100) : 0;
+  state.history.push({ date:state.lastDate, pct });
+  if (state.history.length > 7) state.history.shift();
+  state.streak = pct >= 70 ? state.streak+1 : 0;
+  Object.values(state.tasks).forEach(arr => arr.forEach(t=>t.done=false));
+}
+state.lastDate = todayStr;
+if (!state.currentWeek) state.currentWeek = 1;
+save();
+
+function allTasks() { return [...state.tasks.sport, ...state.tasks.spirit, ...state.tasks.routine]; }
+function save() { try { localStorage.setItem('weblog-v3', JSON.stringify(state)); } catch(e){} }
+
+let selEmoji = { sport:'💪', spirit:'🙏', routine:'💧' };
+
+function renderSection(sec) {
+  const list = document.getElementById(sec+'-list');
+  list.innerHTML = '';
+  state.tasks[sec].forEach(task => {
+    const card = document.createElement('div');
+    card.className = 'task-card fadein' + (task.done ? ' done' : '');
+    card.innerHTML = `<div class="check-box">${task.done?'✓':''}</div><div class="task-emoji">${task.emoji}</div><div class="task-body"><div class="task-title">${task.title}</div>${task.desc?`<div class="task-desc">${task.desc}</div>`:''}</div><span class="task-status">${task.done?'Fait':'—'}</span><button class="task-del" onclick="delTask(event,'${sec}',${task.id})">✕</button>`;
+    card.addEventListener('click', e => { if(e.target.classList.contains('task-del')) return; toggleTask(sec,task.id,card); });
+    list.appendChild(card);
+  });
+  renderEmojiPicker(sec); updateCount(sec);
+}
+
+function renderEmojiPicker(sec) {
+  const w = document.getElementById('ep-'+sec); w.innerHTML='';
+  EMOJIS[sec].forEach(em => { const b=document.createElement('button'); b.className='ep'+(selEmoji[sec]===em?' sel':''); b.textContent=em; b.onclick=()=>{selEmoji[sec]=em;renderEmojiPicker(sec);}; w.appendChild(b); });
+}
+
+function updateCount(sec) { const t=state.tasks[sec]; const el=document.getElementById(sec+'-count'); if(el) el.textContent=`${t.filter(x=>x.done).length}/${t.length}`; }
+
+function updateProgress() {
+  const all=allTasks(); const done=all.filter(t=>t.done).length; const pct=all.length?Math.round(done/all.length*100):0;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progText').textContent=`${done}/${all.length}`;
+  const sd=document.getElementById('statDone'); const sp=document.getElementById('statPct');
+  if(sd) sd.textContent=done; if(sp) sp.textContent=pct+'%';
+}
+
+function renderPlan() {
+  const cw = state.currentWeek;
+  const cwPlan = PLAN[cw-1];
+  document.getElementById('currentWeekBanner').innerHTML = `<div class="current-week-banner"><div class="cwb-icon">🏃</div><div class="cwb-body"><div class="cwb-label">Semaine en cours — ${cw}/16</div><div class="cwb-title">${cwPlan.title} · ${cwPlan.dist}</div></div>${cw<16?`<button onclick="advanceWeek()" style="background:var(--red);color:#fff;border:none;padding:.4rem .8rem;border-radius:3px;font-family:'Oswald',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;">Sem. suivante →</button>`:'<span style="font-family:\'Oswald\',sans-serif;font-size:.7rem;color:var(--red);font-weight:700;flex-shrink:0;">🏁 OBJECTIF ATTEINT</span>'}</div>`;
+
+  const phases = [
+    { label:'Phase 1', weeks:[1,2,3,4],   color:'#c41a1a' },
+    { label:'Phase 2', weeks:[5,6,7,8],   color:'#1a3a8f' },
+    { label:'Phase 3', weeks:[9,10,11,12],color:'#2e7d4f' },
+    { label:'Phase 4', weeks:[13,14,15,16],color:'#c67a00' },
+  ];
+  const wrap = document.getElementById('planProgressWrap'); wrap.innerHTML='';
+  phases.forEach(ph => {
+    const minW=Math.min(...ph.weeks), maxW=Math.max(...ph.weeks);
+    let pct = 0;
+    if (cw > maxW) pct = 100;
+    else if (cw >= minW) pct = Math.round((cw - minW) / ph.weeks.length * 100);
+    wrap.innerHTML += `<div class="plan-week-row"><div class="plan-week-label">${ph.label}</div><div class="plan-week-bar-outer"><div class="plan-week-bar-inner" style="width:${pct}%;background:${ph.color};"></div></div><div class="plan-week-km">S${minW}–${maxW}</div></div>`;
+  });
+
+  const wc = document.getElementById('weekCards'); wc.innerHTML='';
+  PLAN.forEach((week, i) => {
+    const wNum=i+1, isDone=wNum<cw, isCurrent=wNum===cw;
+    const card=document.createElement('div');
+    card.className='week-card'+(isCurrent?' current':'')+(isDone?' done-week':'');
+    card.dataset.week=wNum;
+    const tagLabel = t => t.replace('tag-','').replace('easy','Facile').replace('tempo','Tempo').replace('long','Longue').replace('rest','Récup').replace('race','COURSE !');
+    card.innerHTML=`<div class="week-card-header" onclick="toggleWeekCard(${wNum})"><span class="week-num">S${wNum}</span><span class="week-title">${week.title}</span><span class="week-dist">${week.dist}</span><span class="week-chevron">▶</span></div><div class="week-body">${week.sessions.map(s=>`<div class="session-row"><div class="session-day">${s.day}</div><div class="session-body"><div class="session-title">${s.title}</div><div class="session-desc">${s.desc}</div></div><span class="session-tag ${s.tag}">${tagLabel(s.tag)}</span></div>`).join('')}</div>`;
+    if(isCurrent){ card.classList.add('open'); card.querySelector('.week-chevron').style.transform='rotate(90deg)'; }
+    wc.appendChild(card);
+  });
+}
+
+function toggleWeekCard(wNum) {
+  const card=document.querySelector(`.week-card[data-week="${wNum}"]`);
+  card.classList.toggle('open');
+  card.querySelector('.week-chevron').style.transform=card.classList.contains('open')?'rotate(90deg)':'';
+}
+
+function advanceWeek() {
+  if(state.currentWeek<16){ state.currentWeek++; save(); renderPlan(); showToast(`Semaine ${state.currentWeek} — En avant !`); }
+}
+
+function renderLog() {
+  document.getElementById('streakNum').textContent=state.streak;
+  const lbl=['Pas encore commencé','1 jour — bon début','En route','Rythme installé','Sérieux maintenant','Impressionnant','Héroïque'];
+  document.getElementById('streakLabel').textContent=lbl[Math.min(state.streak,lbl.length-1)];
+  const all=allTasks(); const done=all.filter(t=>t.done).length; const pct=all.length?Math.round(done/all.length*100):0;
+  document.getElementById('statDone').textContent=done; document.getElementById('statPct').textContent=pct+'%';
+  const grid=document.getElementById('weekGrid'); grid.innerHTML='';
+  const dn=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const todayDow=(new Date().getDay()+6)%7;
+  for(let i=6;i>=0;i--){ const dow=(todayDow-i+7)%7; const hist=state.history[state.history.length-i-1]; const isToday=i===0; let cls='wday'; if(isToday) cls+=' today'; else if(hist&&hist.pct>=70) cls+=' done'; const cell=document.createElement('div'); cell.className=cls; cell.innerHTML=`<div class="dot"></div>${dn[dow]}`; grid.appendChild(cell); }
+  const flavors=[[100,'<strong>Mission accomplie.</strong> Parker serait fier. Maintenant repose-toi — demain recommence.'],[70,'<strong>Bonne journée.</strong> L\'essentiel est fait. Un héros sait aussi s\'arrêter.'],[30,'La journée n\'est pas finie. <strong>Chaque tâche cochée est une toile de plus.</strong>'],[1,'Tu as commencé. C\'est le plus dur. <strong>Continue.</strong>'],[0,'La page est blanche. <strong>Ce que tu fais maintenant définit qui tu es.</strong>']];
+  document.getElementById('flavorBox').innerHTML=flavors.find(([t])=>pct>=t)[1];
+}
+
+function renderAll() { ['sport','spirit','routine'].forEach(renderSection); updateProgress(); }
+
+function toggleTask(sec,id,card) {
+  const task=state.tasks[sec].find(t=>t.id===id); if(!task) return;
+  task.done=!task.done; save();
+  card.classList.toggle('done',task.done);
+  card.querySelector('.check-box').textContent=task.done?'✓':'';
+  card.querySelector('.task-title').style.textDecoration=task.done?'line-through':'';
+  card.querySelector('.task-status').textContent=task.done?'Fait':'—';
+  card.querySelector('.task-emoji').style.opacity=task.done?'.35':'1';
+  updateCount(sec); updateProgress();
+  if(task.done) showCelebration(); else showToast('Tâche décochée');
+}
+
+function delTask(e,sec,id){ e.stopPropagation(); state.tasks[sec]=state.tasks[sec].filter(t=>t.id!==id); save(); renderSection(sec); updateProgress(); }
+
+function addTask(sec){ const input=document.getElementById(sec+'-input'); const title=input.value.trim(); if(!title){input.focus();return;} state.tasks[sec].push({id:state.nextId[sec]++,emoji:selEmoji[sec],title,desc:'',done:false}); input.value=''; save(); renderSection(sec); updateProgress(); }
+['sport','spirit','routine'].forEach(s=>{ document.getElementById(s+'-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTask(s);}); });
+
+function resetSection(sec){ state.tasks[sec].forEach(t=>t.done=false); save(); renderSection(sec); updateProgress(); }
+
+function showTab(id){ document.querySelectorAll('.section-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('panel-'+id).classList.add('active'); document.getElementById('tab-'+id).classList.add('active'); if(id==='log') renderLog(); if(id==='run') renderPlan(); }
+
+// CELEBRATION
+const CEL_DATA=[
+  {bang:'Objectif atteint', title:'Bien joué.',        msg:'<strong>Une tâche de moins.</strong> Continue comme ça.'},
+  {bang:'Mission validée',  title:'En route !',         msg:'Parker ne s\'arrête jamais. <strong>Toi non plus.</strong>'},
+  {bang:'Accompli',         title:"C'est noté.",        msg:'Chaque action compte. <strong>Même la plus petite.</strong>'},
+  {bang:'Check !',          title:'Solide.',            msg:'<strong>La discipline, c\'est ça.</strong> Jour après jour.'},
+  {bang:'Héroïque',         title:'Impressionnant.',    msg:'Spider-Man approuve. <strong>Sérieusement.</strong>'},
+  {bang:'Dans la toile',    title:'Tu tiens le rythme.',msg:'<strong>Ce sont les habitudes qui font les héros.</strong>'},
+  {bang:'Validé',           title:'Pas mal du tout.',   msg:'With great power comes great <strong>daily routine</strong>.'},
+];
+let celQueue=[],celShowing=false;
+function showCelebration(){ const d=CEL_DATA[Math.floor(Math.random()*CEL_DATA.length)]; celQueue.push(d); if(!celShowing) processQueue(); }
+function processQueue(){ if(!celQueue.length){celShowing=false;return;} celShowing=true; const d=celQueue.shift(); document.getElementById('celBang').textContent=d.bang; document.getElementById('celTitle').textContent=d.title; document.getElementById('celMsg').innerHTML=d.msg; document.getElementById('celPopup').classList.remove('hiding'); document.getElementById('celOverlay').style.display='flex'; }
+function closeCel(){ document.getElementById('celPopup').classList.add('hiding'); setTimeout(()=>{document.getElementById('celOverlay').style.display='none';processQueue();},240); }
+document.getElementById('celOverlay').addEventListener('click',function(e){if(e.target===this)closeCel();});
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+
+// INIT
+const now=new Date();
+const days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const months=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+document.getElementById('dateDay').textContent=days[now.getDay()];
+document.getElementById('dateRest').textContent=`${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} ·`;
+const start=new Date(state.startDate);
+document.getElementById('dayNum').textContent=String(Math.floor((now-start)/86400000)+1).padStart(3,'0');
+document.getElementById('tickerInner').textContent=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+renderAll();
+</script>
+
+</body>
+</html>
